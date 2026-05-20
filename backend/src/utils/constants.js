@@ -12,3 +12,11 @@ export const BRAG_STATUS = {
 };
 
 export const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
+
+export const PLAN_ITEM_TYPES = ['Milestone', 'Work Task', 'Subtask'];
+
+export const RAID_TYPES = ['Risk', 'Assumption', 'Issue', 'Dependency', 'Decision'];
+
+export const RAID_STATUSES = ['Open', 'In Progress', 'Closed'];
+
+export const RACI_ROLES = ['Responsible', 'Accountable', 'Consulted', 'Informed'];

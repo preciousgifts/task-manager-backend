@@ -1,5 +1,7 @@
 import Project from '../models/Project.js';
 import Task from '../models/Task.js';
+import PlanItem from '../models/PlanItem.js';
+import RaidItem from '../models/RaidItem.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { created, ok } from '../utils/response.js';
 import { AppError } from '../middleware/errorMiddleware.js';
@@ -20,7 +22,11 @@ export const getProjects = asyncHandler(async (req, res) => {
   let projects = await Project.find(query).populate('owner', 'name email role').sort({ updatedAt: -1 });
 
   if (req.user.role === ROLES.TEAM_MEMBER) {
-    const assignedProjectIds = await Task.distinct('project', { assignedTo: req.user._id });
+    const [taskProjectIds, planProjectIds] = await Promise.all([
+      Task.distinct('project', { assignedTo: req.user._id }),
+      PlanItem.distinct('project', { assignedTo: req.user._id })
+    ]);
+    const assignedProjectIds = [...new Set([...taskProjectIds, ...planProjectIds].map((id) => id.toString()))];
     projects = await Project.find({ _id: { $in: assignedProjectIds }, ...(status ? { bragStatus: status } : {}) })
       .populate('owner', 'name email role')
       .sort({ updatedAt: -1 });
@@ -36,8 +42,11 @@ export const getProject = asyncHandler(async (req, res) => {
     throw new AppError('Project managers can only view their own projects', 403);
   }
   if (req.user.role === ROLES.TEAM_MEMBER) {
-    const assignedTask = await Task.exists({ project: project._id, assignedTo: req.user._id });
-    if (!assignedTask) throw new AppError('You can only view projects with tasks assigned to you', 403);
+    const [assignedTask, assignedPlanItem] = await Promise.all([
+      Task.exists({ project: project._id, assignedTo: req.user._id }),
+      PlanItem.exists({ project: project._id, assignedTo: req.user._id })
+    ]);
+    if (!assignedTask && !assignedPlanItem) throw new AppError('You can only view projects with work assigned to you', 403);
   }
   ok(res, { project });
 });
@@ -70,6 +79,8 @@ export const deleteProject = asyncHandler(async (req, res) => {
   }
 
   await Task.deleteMany({ project: project._id });
+  await PlanItem.deleteMany({ project: project._id });
+  await RaidItem.deleteMany({ project: project._id });
   await project.deleteOne();
   ok(res, null, 'Project and related tasks deleted');
 });

@@ -7,6 +7,9 @@ import userRoutes from './routes/userRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import planRoutes from './routes/planRoutes.js';
+import raidRoutes from './routes/raidRoutes.js';
+import updateRoutes from './routes/updateRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -35,6 +38,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/plan-items', planRoutes);
+app.use('/api/raids', raidRoutes);
+app.use('/api/updates', updateRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 app.use(notFound);

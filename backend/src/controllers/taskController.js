@@ -38,6 +38,11 @@ export const getTasks = asyncHandler(async (req, res) => {
     query.project = project && ownedProjectIds.includes(project) ? project : { $in: projects.map((item) => item._id) };
   }
 
+  await Task.updateMany(
+    { ...query, dueDate: { $lt: new Date() }, bragStatus: { $ne: 'Blue' } },
+    { bragStatus: 'Red' }
+  );
+
   const tasks = await populateTask(Task.find(query).sort({ dueDate: 1, updatedAt: -1 }));
   ok(res, { tasks });
 });

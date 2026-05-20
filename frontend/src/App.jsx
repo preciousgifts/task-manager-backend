@@ -4,7 +4,9 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Projects from './pages/Projects.jsx';
+import ProjectWorkspace from './pages/ProjectWorkspace.jsx';
 import Tasks from './pages/Tasks.jsx';
+import Updates from './pages/Updates.jsx';
 import Users from './pages/Users.jsx';
 
 const App = () => (
@@ -20,7 +22,9 @@ const App = () => (
     >
       <Route index element={<Dashboard />} />
       <Route path="projects" element={<Projects />} />
+      <Route path="projects/:id" element={<ProjectWorkspace />} />
       <Route path="tasks" element={<Tasks />} />
+      <Route path="updates" element={<Updates />} />
       <Route
         path="users"
         element={

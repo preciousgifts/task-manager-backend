@@ -1,11 +1,12 @@
 import { Edit3, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import EmptyState from '../components/EmptyState.jsx';
 import ProjectForm from '../components/ProjectForm.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { projectService } from '../services/projectService.js';
-import { BRAG_STATUSES } from '../utils/constants.js';
+import { BRAG_STATUSES, money } from '../utils/constants.js';
 
 const Projects = () => {
   const { user } = useAuth();
@@ -48,7 +49,7 @@ const Projects = () => {
   };
 
   const deleteProject = async (id) => {
-    if (!window.confirm('Delete this project and its tasks?')) return;
+    if (!window.confirm('Delete this project, its tasks, plan, and RAIDS log?')) return;
     await projectService.remove(id);
     await loadProjects();
   };
@@ -96,6 +97,13 @@ const Projects = () => {
                 <span>Start: <b>{new Date(project.startDate).toLocaleDateString()}</b></span>
                 <span>End: <b>{new Date(project.endDate).toLocaleDateString()}</b></span>
               </div>
+              {project.planConfig?.showCost && (
+                <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-3">
+                  <span>Planned: <b>{money(project.costSummary?.plannedCost)}</b></span>
+                  <span>Actual: <b>{money(project.costSummary?.actualCost)}</b></span>
+                  <span>Variance: <b>{money(project.costSummary?.variance)}</b></span>
+                </div>
+              )}
               <div className="mt-5">
                 <div className="mb-2 flex justify-between text-xs font-semibold text-slate-500">
                   <span>Progress</span><span>{project.progress}%</span>
@@ -104,12 +112,15 @@ const Projects = () => {
                   <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${project.progress}%` }} />
                 </div>
               </div>
-              {canManage && (
-                <div className="mt-5 flex gap-2">
-                  <button className="btn-secondary" onClick={() => { setEditing(project); setShowForm(true); }}><Edit3 size={16} /> Edit</button>
-                  <button className="btn-secondary text-red-600" onClick={() => deleteProject(project._id)}><Trash2 size={16} /> Delete</button>
-                </div>
-              )}
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link className="btn-secondary" to={`/projects/${project._id}`}>Open workspace</Link>
+                {canManage && (
+                  <>
+                    <button className="btn-secondary" onClick={() => { setEditing(project); setShowForm(true); }}><Edit3 size={16} /> Edit</button>
+                    <button className="btn-secondary text-red-600" onClick={() => deleteProject(project._id)}><Trash2 size={16} /> Delete</button>
+                  </>
+                )}
+              </div>
             </article>
           ))}
         </div>

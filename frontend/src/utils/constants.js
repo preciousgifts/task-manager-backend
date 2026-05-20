@@ -1,6 +1,10 @@
 export const ROLES = ['Admin', 'Project Manager', 'Team Member'];
 export const BRAG_STATUSES = ['Blue', 'Red', 'Amber', 'Green'];
 export const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
+export const PLAN_ITEM_TYPES = ['Milestone', 'Work Task', 'Subtask'];
+export const RAID_TYPES = ['Risk', 'Assumption', 'Issue', 'Dependency', 'Decision'];
+export const RAID_STATUSES = ['Open', 'In Progress', 'Closed'];
+export const RACI_ROLES = ['Responsible', 'Accountable', 'Consulted', 'Informed'];
 
 export const statusMeta = {
   Blue: { label: 'Completed', classes: 'bg-blue-100 text-blue-700 ring-blue-200' },
@@ -13,3 +17,6 @@ export const toDateInput = (date) => (date ? new Date(date).toISOString().slice(
 
 export const isOverdue = (task) =>
   task?.dueDate && new Date(task.dueDate) < new Date() && task.bragStatus !== 'Blue';
+
+export const money = (value) =>
+  new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);

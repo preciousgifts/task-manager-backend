@@ -1,4 +1,4 @@
-import { ClipboardList, FolderKanban, LayoutDashboard, LogOut, Menu, Users, X } from 'lucide-react';
+import { ClipboardList, FolderKanban, LayoutDashboard, LogOut, Menu, Siren, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -7,6 +7,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/projects', label: 'Projects', icon: FolderKanban },
   { to: '/tasks', label: 'Tasks', icon: ClipboardList },
+  { to: '/updates', label: 'Updates', icon: Siren },
   { to: '/users', label: 'Users', icon: Users, adminOnly: true }
 ];
 

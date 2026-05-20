@@ -30,4 +30,11 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ title: 'text', description: 'text' });
 
+taskSchema.pre('save', function markOverdue(next) {
+  if (this.dueDate < new Date() && this.bragStatus !== BRAG_STATUS.BLUE) {
+    this.bragStatus = BRAG_STATUS.RED;
+  }
+  next();
+});
+
 export default mongoose.model('Task', taskSchema);
