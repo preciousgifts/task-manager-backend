@@ -48,7 +48,8 @@ frontend/
 ## Prerequisites
 
 - Node.js 18+
-- MongoDB running locally or a MongoDB Atlas connection string
+- PostgreSQL 14+
+- MongoDB only if you want to migrate old Mongo data into PostgreSQL
 
 ## Backend Setup
 
@@ -56,6 +57,8 @@ frontend/
 cd backend
 npm install
 cp .env.example .env
+npx prisma generate
+npx prisma migrate deploy
 npm run dev
 ```
 
@@ -63,13 +66,21 @@ Update `backend/.env`:
 
 ```env
 PORT=5000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pm_task_tracker?schema=public
 MONGODB_URI=mongodb://127.0.0.1:27017/pm_task_tracker
 JWT_SECRET=replace_with_a_long_random_secret
 JWT_EXPIRES_IN=7d
-CLIENT_URL=http://localhost:5173
+CLIENT_URLS=http://localhost:5173,http://localhost:5174
 ```
 
 The API will run at `http://localhost:5000/api`.
+
+To migrate existing MongoDB data after the PostgreSQL schema is ready:
+
+```bash
+cd backend
+npm run migrate:mongo
+```
 
 ## Frontend Setup
 
@@ -101,6 +112,8 @@ The app will run at `http://localhost:5173`.
 - `GET /api/projects/:id`
 - `PATCH /api/projects/:id`
 - `DELETE /api/projects/:id`
+- `GET /api/projects/:id/export`
+- `POST /api/projects/:id/import`
 - `GET /api/tasks`
 - `POST /api/tasks`
 - `GET /api/tasks/:id`
@@ -108,11 +121,14 @@ The app will run at `http://localhost:5173`.
 - `DELETE /api/tasks/:id`
 - `POST /api/tasks/:id/comments`
 - `GET /api/dashboard/summary`
+- `GET /api/updates`
 
 ## First Run
 
-1. Start MongoDB.
-2. Start the backend.
-3. Start the frontend.
-4. Register an Admin or Project Manager account.
-5. Create projects, create tasks, assign users, and track BRAG health from the dashboard.
+1. Start PostgreSQL and create the database from `DATABASE_URL`.
+2. Run `npx prisma migrate deploy`.
+3. Optionally run `npm run migrate:mongo` if you have old MongoDB data.
+4. Start the backend.
+5. Start the frontend.
+6. Register an Admin or Project Manager account.
+7. Create projects, create tasks, assign users, and track BRAG health from the dashboard.

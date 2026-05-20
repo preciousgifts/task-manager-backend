@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String           @id @default(cuid())
+  name           String
+  email          String           @unique
+  password       String
+  role           String           @default("Team Member")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ownedProjects  Project[]        @relation("ProjectOwner")
+  assignedTasks  Task[]           @relation("TaskAssignee")
+  taskComments   TaskComment[]
+  assignedPlans  PlanItem[]       @relation("PlanAssignee")
+  planComments   PlanComment[]
+  raidItems      RaidItem[]       @relation("RaidOwner")
+  raciAssignments RaciAssignment[]
+}
+
+model Project {
+  id                 String     @id @default(cuid())
+  name               String
+  description        String     @default("")
+  ownerId            String
+  owner              User       @relation("ProjectOwner", fields: [ownerId], references: [id])
+  startDate          DateTime
+  endDate            DateTime
+  bragStatus         String     @default("Green")
+  progress           Int        @default(0)
+  showDescription    Boolean    @default(true)
+  showAssignee       Boolean    @default(true)
+  showDates          Boolean    @default(true)
+  showBragStatus     Boolean    @default(true)
+  showPriority       Boolean    @default(true)
+  showProgress       Boolean    @default(true)
+  showCost           Boolean    @default(false)
+  showRaci           Boolean    @default(false)
+  plannedCost        Float      @default(0)
+  actualCost         Float      @default(0)
+  costVariance       Float      @default(0)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  tasks              Task[]
+  planItems          PlanItem[]
+  raidItems          RaidItem[]
+}
+
+model Task {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String        @default("")
+  assignedToId String?
+  assignedTo  User?         @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  startDate   DateTime
+  dueDate     DateTime
+  bragStatus  String        @default("Green")
+  priority    String        @default("Medium")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  comments    TaskComment[]
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  text      String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PlanItem {
+  id            String           @id @default(cuid())
+  projectId     String
+  project       Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentId      String?
+  parent        PlanItem?        @relation("PlanHierarchy", fields: [parentId], references: [id])
+  children      PlanItem[]       @relation("PlanHierarchy")
+  type          String
+  knowledgeArea String           @default("Schedule")
+  title         String
+  description   String           @default("")
+  assignedToId  String?
+  assignedTo    User?            @relation("PlanAssignee", fields: [assignedToId], references: [id])
+  startDate     DateTime
+  dueDate       DateTime
+  revisedDate   DateTime?
+  bragStatus    String           @default("Green")
+  priority      String           @default("Medium")
+  progress      Int              @default(0)
+  plannedCost   Float            @default(0)
+  actualCost    Float            @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  comments      PlanComment[]
+  raci          RaciAssignment[]
+}
+
+model PlanComment {
+  id         String   @id @default(cuid())
+  planItemId String
+  planItem   PlanItem @relation(fields: [planItemId], references: [id], onDelete: Cascade)
+  text       String
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model RaciAssignment {
+  id             String   @id @default(cuid())
+  planItemId     String
+  planItem       PlanItem @relation(fields: [planItemId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  responsibility String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model RaidItem {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  description String   @default("")
+  ownerId     String?
+  owner       User?    @relation("RaidOwner", fields: [ownerId], references: [id])
+  dueDate     DateTime?
+  status      String   @default("Open")
+  priority    String   @default("Medium")
+  impact      String   @default("Medium")
+  mitigation  String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
