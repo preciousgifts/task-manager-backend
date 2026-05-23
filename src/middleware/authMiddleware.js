@@ -15,8 +15,11 @@ export const protect = async (req, _res, next) => {
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
     if (!user) throw new AppError('User no longer exists', 401);
+    if (user.activeSessionId && decoded.sessionId !== user.activeSessionId) {
+      throw new AppError('Your session has been replaced by a newer login', 401);
+    }
 
-    const { password: _password, ...safeUser } = user;
+    const { password: _password, activeSessionId: _activeSessionId, ...safeUser } = user;
     req.user = toApi(safeUser);
     next();
   } catch (error) {

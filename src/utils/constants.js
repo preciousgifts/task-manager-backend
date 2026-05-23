@@ -13,7 +13,7 @@ export const BRAG_STATUS = {
 
 export const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
 
-export const PLAN_ITEM_TYPES = ['Milestone', 'Work Task', 'Subtask'];
+export const PLAN_ITEM_TYPES = ['Milestone', 'Phase', 'Work Task', 'Subtask'];
 
 export const RAID_TYPES = ['Risk', 'Assumption', 'Issue', 'Dependency', 'Decision'];
 

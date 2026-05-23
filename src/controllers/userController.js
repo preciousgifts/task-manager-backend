@@ -7,7 +7,7 @@ import { toApi } from '../utils/serialize.js';
 
 const publicUser = (user) => {
   if (!user) return user;
-  const { password: _password, ...safeUser } = user;
+  const { password: _password, activeSessionId: _activeSessionId, ...safeUser } = user;
   return toApi(safeUser);
 };
 

@@ -28,7 +28,7 @@ router.use(protect);
 router.get('/', getTasks);
 router.get('/:id', getTask);
 router.post('/', authorize(...managerRoles), taskValidation, validate, createTask);
-router.patch('/:id', authorize(...managerRoles), updateTask);
+router.patch('/:id', updateTask);
 router.delete('/:id', authorize(...managerRoles), deleteTask);
 router.post(
   '/:id/comments',

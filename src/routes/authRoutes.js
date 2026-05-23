@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { login, me, register } from '../controllers/authController.js';
+import { login, logout, me, register, updateSessionSettings } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { validate } from '../middleware/errorMiddleware.js';
 import { ROLES } from '../utils/constants.js';
@@ -30,5 +30,7 @@ router.post(
 );
 
 router.get('/me', protect, me);
+router.patch('/session-settings', protect, updateSessionSettings);
+router.post('/logout', protect, logout);
 
 export default router;

@@ -10,9 +10,24 @@ export const getUpdates = asyncHandler(async (req, res) => {
   const projectFilter = accessibleProjectIds ? { projectId: { in: accessibleProjectIds } } : {};
   const statusFilter = { bragStatus: { in: [BRAG_STATUS.RED, BRAG_STATUS.AMBER] } };
 
+  const today = new Date();
   await Promise.all([
-    prisma.task.updateMany({ where: { ...projectFilter, dueDate: { lt: new Date() }, bragStatus: { not: BRAG_STATUS.BLUE } }, data: { bragStatus: BRAG_STATUS.RED } }),
-    prisma.planItem.updateMany({ where: { ...projectFilter, dueDate: { lt: new Date() }, bragStatus: { not: BRAG_STATUS.BLUE } }, data: { bragStatus: BRAG_STATUS.RED } })
+    prisma.task.updateMany({
+      where: {
+        ...projectFilter,
+        OR: [{ revisedDate: null, dueDate: { lt: today } }, { revisedDate: { lt: today } }],
+        bragStatus: { not: BRAG_STATUS.BLUE }
+      },
+      data: { bragStatus: BRAG_STATUS.RED }
+    }),
+    prisma.planItem.updateMany({
+      where: {
+        ...projectFilter,
+        OR: [{ revisedDate: null, dueDate: { lt: today } }, { revisedDate: { lt: today } }],
+        bragStatus: { not: BRAG_STATUS.BLUE }
+      },
+      data: { bragStatus: BRAG_STATUS.RED }
+    })
   ]);
 
   const [tasks, planItems] = await Promise.all([
